@@ -121,7 +121,13 @@
                 <form method="POST" action="{{ url('/deposit') }}">
                     @csrf
                     <input type="text" name="order_id" value="{{ $depoId }}" required readonly>
-                    <input type="number" name="amount" placeholder="Amount" required step="0.01">
+                    <!-- Input dengan format number (menampilkan dengan separator) -->
+                    <input type="text" class="format_number" placeholder="Amount" required step="0.01">
+
+                    <!-- Input untuk mengirimkan nilai ke server (tanpa separator) -->
+                    <input type="number" class="tanpa_format_number" name="amount" placeholder="Amount" required
+                        step="0.01" hidden>
+
                     <button type="submit">Deposit</button>
                 </form>
             </div>
@@ -132,7 +138,11 @@
                 <form action="{{ route('withdrawal') }}" method="POST">
                     @csrf
                     <input type="text" name="order_id" value="{{ $widthId }}" required readonly>
-                    <input type="number" step="0.01" name="amount" placeholder="Amount" required>
+                    <input type="text" class="format_number2" placeholder="Amount" required step="0.01">
+
+                    <!-- Input untuk mengirimkan nilai ke server (tanpa separator) -->
+                    <input type="number" class="tanpa_format_number2" name="amount" placeholder="Amount" required
+                        step="0.01" hidden>
                     <button type="submit">Withdraw</button>
                 </form>
             </div>
@@ -154,6 +164,86 @@
 
     <!-- Menambahkan SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formatNumberInput = document.querySelector('.format_number');
+            const tanpaFormatNumberInput = document.querySelector('.tanpa_format_number');
+
+            // Fungsi untuk format number dengan separator
+            function formatNumber(value) {
+                // Menghapus karakter yang tidak diinginkan (selain angka dan koma/titik)
+                value = value.replace(/[^0-9.-]+/g, '');
+
+                // Format angka dengan pemisah ribuan
+                const parts = value.split('.');
+                const integerPart = parts[0];
+                const decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+                const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return formattedInteger + decimalPart;
+            }
+
+            // Fungsi untuk mengubah format ke angka murni tanpa separator
+            function parseNumber(value) {
+                return value.replace(/[^0-9.-]+/g, ''); // Menghapus semua selain angka dan tanda desimal
+            }
+
+            // Ketika pengguna mengetikkan sesuatu di input format_number
+            formatNumberInput.addEventListener('input', function() {
+                // Mengformat angka dengan pemisah ribuan
+                const formattedValue = formatNumber(formatNumberInput.value);
+                formatNumberInput.value = formattedValue;
+
+                // Simpan nilai yang sudah diproses (tanpa separator) di input yang tersembunyi
+                tanpaFormatNumberInput.value = parseNumber(formattedValue);
+            });
+
+            // Pastikan saat form disubmit, nilai yang dikirim adalah nilai tanpa format
+            document.querySelector('form').addEventListener('submit', function() {
+                tanpaFormatNumberInput.value = parseNumber(formatNumberInput.value);
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formatNumberInput = document.querySelector('.format_number2');
+            const tanpaFormatNumberInput = document.querySelector('.tanpa_format_number2');
+
+            // Fungsi untuk format number dengan separator
+            function formatNumber(value) {
+                // Menghapus karakter yang tidak diinginkan (selain angka dan koma/titik)
+                value = value.replace(/[^0-9.-]+/g, '');
+
+                // Format angka dengan pemisah ribuan
+                const parts = value.split('.');
+                const integerPart = parts[0];
+                const decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+                const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return formattedInteger + decimalPart;
+            }
+
+            // Fungsi untuk mengubah format ke angka murni tanpa separator
+            function parseNumber(value) {
+                return value.replace(/[^0-9.-]+/g, ''); // Menghapus semua selain angka dan tanda desimal
+            }
+
+            // Ketika pengguna mengetikkan sesuatu di input format_number
+            formatNumberInput.addEventListener('input', function() {
+                // Mengformat angka dengan pemisah ribuan
+                const formattedValue = formatNumber(formatNumberInput.value);
+                formatNumberInput.value = formattedValue;
+
+                // Simpan nilai yang sudah diproses (tanpa separator) di input yang tersembunyi
+                tanpaFormatNumberInput.value = parseNumber(formattedValue);
+            });
+
+            // Pastikan saat form disubmit, nilai yang dikirim adalah nilai tanpa format
+            document.querySelector('form').addEventListener('submit', function() {
+                tanpaFormatNumberInput.value = parseNumber(formatNumberInput.value);
+            });
+        });
+    </script>
 
     @if (session('message'))
         <script>
